@@ -1,14 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.example.pokemon"
-    compileSdk  = 36
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.pokemon"
@@ -22,16 +22,23 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-//         Room schema export
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
+        sourceSets {
+            getByName("main") {
+                kotlin.directories.add("build/generated/ksp/main/kotlin")
+            }
+            getByName("debug") {
+                kotlin.directories.add("build/generated/ksp/debug/kotlin")
+            }
+            getByName("release") {
+                kotlin.directories.add("build/generated/ksp/release/kotlin")
+            }
         }
+
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -70,7 +77,6 @@ dependencies {
 
     // Networking
     implementation(libs.bundles.networking)
-    ksp(libs.moshi.codegen)
 
     // Dependency Injection
     implementation(libs.hilt.android)
@@ -86,6 +92,7 @@ dependencies {
 
     // Navigation
     implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     // Coroutines
     implementation(libs.bundles.coroutines)
@@ -109,9 +116,8 @@ dependencies {
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-}
 
-// Allow references to generated code (Hilt)
-//kapt {
-//    correctErrorTypes = true
-//}
+    // For standard icons like Search, Home, Menu
+    implementation(libs.compose.material.icons.core)
+
+}
