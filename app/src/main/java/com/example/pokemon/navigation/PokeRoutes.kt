@@ -14,5 +14,5 @@ sealed interface Screen {
     data object Favorite : Screen
 
     @Serializable
-    data class PokemonDetail(val id: Int, val name: String) : Screen
+    data class PokemonDetail(val pokemonId: Int) : Screen
 }
