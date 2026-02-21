@@ -15,13 +15,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.pokemon.navigation.PokeNavHost
 import com.example.pokemon.navigation.bottomBar.PokeBottomBar
 import com.example.pokemon.ui.theme.PokemonTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
             val navHostController = rememberNavController()
             val backStackEntry = navHostController.currentBackStackEntryAsState()
             val currentDestination = backStackEntry.value?.destination
