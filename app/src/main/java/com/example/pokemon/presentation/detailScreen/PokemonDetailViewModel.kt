@@ -3,7 +3,7 @@ package com.example.pokemon.presentation.detailScreen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.pokemon.domain.model.Pokemon
-import com.example.pokemon.util.DummyData
+import com.example.pokemon.domain.repository.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,13 +24,3 @@ class PokemonDetailViewModel @Inject constructor(
     }
 }
 
-
-class PokemonRepository @Inject constructor() {
-    fun getPokemon(pokemonId: Int): Pokemon? {
-        val dummyData = DummyData.pokemonList
-        val poke = dummyData.find {
-            it.id == pokemonId
-        }
-        return poke
-    }
-}
