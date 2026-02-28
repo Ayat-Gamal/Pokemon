@@ -9,28 +9,54 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pokemon.domain.model.Pokemon
 import com.example.pokemon.presentation.homeScreen.component.PokemonCardItem
 import com.example.pokemon.ui.theme.PokemonTheme
 import com.example.pokemon.util.DummyData
+import com.example.pokemon.util.uiStates.EmptyView
+import com.example.pokemon.util.uiStates.ErrorView
+import com.example.pokemon.util.uiStates.LoadingGrid
 
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onPokemonClick: (clickedPokeId : Int)  -> Unit
-    ) {
-     val dummyData = DummyData.pokemonList
+    viewModel: HomeViewModel = hiltViewModel(),
+    onPokemonClick: (clickedPokeId: Int) -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Column {
-        PokemonGrid(
-            dummyData, modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            onPokemonClick =   onPokemonClick
-        )
+        when {
+            uiState.isLoading -> {
+                LoadingGrid()
+            }
+            uiState.isEmpty -> {
+                EmptyView()
+            }
+            uiState.error != null && uiState.pokemonList.isEmpty() -> {
+                ErrorView(
+                    message = uiState.error!!,
+                    isRetry = true,
+                    onRetry = { viewModel.loadPokemon() }
+                )
+            }
+
+            else -> {
+                PokemonGrid(
+                    uiState.pokemonList, modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    onPokemonClick = onPokemonClick
+                )
+            }
+        }
+
     }
 }
 
@@ -38,7 +64,7 @@ fun HomeScreen(
 fun PokemonGrid(
     pokemonList: List<Pokemon>,
     modifier: Modifier = Modifier,
-    onPokemonClick: (clickedPokeId : Int)  -> Unit
+    onPokemonClick: (clickedPokeId: Int) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -50,7 +76,7 @@ fun PokemonGrid(
         ) {
         items(pokemonList) { poke ->
             PokemonCardItem(
-                poke =  poke,
+                poke = poke,
                 onPokemonClick = onPokemonClick
             )
         }
@@ -62,7 +88,7 @@ fun PokemonGrid(
 private fun PokemonCardItemPrev() {
     PokemonCardItem(
         modifier = Modifier,
-        poke= DummyData.pokemonList[2],
+        poke = DummyData.pokemonList[2],
         onPokemonClick = {}
     )
 }
